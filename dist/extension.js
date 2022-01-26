@@ -4266,34 +4266,6 @@ module.exports = function isAxiosError(payload) {
 
 /***/ }),
 /* 50 */
-/***/ ((module) => {
-
-var replacements = [
-  [/\*/g, '\\*', 'asterisks'],
-  [/#/g, '\\#', 'number signs'],
-  [/\//g, '\\/', 'slashes'],
-  [/\(/g, '\\(', 'parentheses'],
-  [/\)/g, '\\)', 'parentheses'],
-  [/\[/g, '\\[', 'square brackets'],
-  [/\]/g, '\\]', 'square brackets'],
-  [/</g, '&lt;', 'angle brackets'],
-  [/>/g, '&gt;', 'angle brackets'],
-  [/_/g, '\\_', 'underscores']
-]
-
-module.exports = function (string, skips) {
-  skips = skips || []
-  return replacements.reduce(function (string, replacement) {
-    var name = replacement[2]
-    return name && skips.indexOf(name) !== -1
-      ? string
-      : string.replace(replacement[0], replacement[1])
-  }, string)
-}
-
-
-/***/ }),
-/* 51 */
 /***/ ((__unused_webpack_module, exports) => {
 
 "use strict";
@@ -4373,6 +4345,34 @@ const unescape = un => replace.call(un, es, cape);
 exports.unescape = unescape;
 
 
+/***/ }),
+/* 51 */
+/***/ ((module) => {
+
+var replacements = [
+  [/\*/g, '\\*', 'asterisks'],
+  [/#/g, '\\#', 'number signs'],
+  [/\//g, '\\/', 'slashes'],
+  [/\(/g, '\\(', 'parentheses'],
+  [/\)/g, '\\)', 'parentheses'],
+  [/\[/g, '\\[', 'square brackets'],
+  [/\]/g, '\\]', 'square brackets'],
+  [/</g, '&lt;', 'angle brackets'],
+  [/>/g, '&gt;', 'angle brackets'],
+  [/_/g, '\\_', 'underscores']
+]
+
+module.exports = function (string, skips) {
+  skips = skips || []
+  return replacements.reduce(function (string, replacement) {
+    var name = replacement[2]
+    return name && skips.indexOf(name) !== -1
+      ? string
+      : string.replace(replacement[0], replacement[1])
+  }, string)
+}
+
+
 /***/ })
 /******/ 	]);
 /************************************************************************/
@@ -4413,8 +4413,8 @@ exports.deactivate = exports.activate = void 0;
 // Import the module and reference it with the alias vscode in your code below
 const vscode = __webpack_require__(1);
 const axios_1 = __webpack_require__(2);
-const html_escaper_1 = __webpack_require__(51);
-const markdownEscape = __webpack_require__(50);
+const html_escaper_1 = __webpack_require__(50);
+const markdownEscape = __webpack_require__(51);
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
 function activate(context) {
@@ -4430,6 +4430,10 @@ function activate(context) {
         if (editor !== undefined) {
             const currentSelection = editor.selection;
             const text = editor.document.getText(currentSelection);
+            if (text.trim() === '') {
+                vscode.window.showErrorMessage('No text is selected');
+                return false;
+            }
             vscode.window.withProgress({
                 location: vscode.ProgressLocation.Window,
                 cancellable: false,
@@ -4458,14 +4462,28 @@ function activate(context) {
                     }
                     var currentLanguage = editor?.document.languageId;
                     // vscode.window.showInformationMessage(`Added wikipedia article for ${text}`);
-                    if (currentLanguage == "markdown") {
+                    if (currentLanguage === "markdown") {
                         editor?.edit(editBuilder => {
                             editBuilder.replace(currentSelection, `[${markdownEscape(text)}](${url} "${markdownEscape(summary)}")`);
                         });
                     }
-                    else if (currentLanguage == "html") {
+                    else if (currentLanguage === "html" || currentLanguage === "jinja") {
                         editor?.edit(editBuilder => {
                             editBuilder.replace(currentSelection, `<a href="${url}" title="${(0, html_escaper_1.escape)(summary)}">${(0, html_escaper_1.escape)(text)}</a>`);
+                        });
+                    }
+                    else {
+                        vscode.window.showWarningMessage(`The current language (${currentLanguage}) is not supported`, ...["Use HTML", "Use Markdown", "Cancel"]).then((answer) => {
+                            if (answer === "Use HTML") {
+                                editor?.edit(editBuilder => {
+                                    editBuilder.replace(currentSelection, `<a href="${url}" title="${(0, html_escaper_1.escape)(summary)}">${(0, html_escaper_1.escape)(text)}</a>`);
+                                });
+                            }
+                            else if (answer === "Use Markdown") {
+                                editor?.edit(editBuilder => {
+                                    editBuilder.replace(currentSelection, `[${markdownEscape(text)}](${url} "${markdownEscape(summary)}")`);
+                                });
+                            }
                         });
                     }
                 }
