@@ -4,18 +4,18 @@
   "publisher": "WasiMaster",
   "displayName": "Wikipedia Hyperlinker",
   "description": "Adds hyperlinks to markdown and HTML files with articles gotten from Wikipedia",
-  "homepage": "https://github.com/wasi-master/wikipedia-hyperlinker#readme",
-  "version": "0.0.1",
+  "homepage": "https://github.com/wasi-master/wikipedia-hyperlink#readme",
+  "version": "0.0.2",
   "bugs": {
-    "url": "https://github.com/wasi-master/wikipedia-hyperlinker/issues",
+    "url": "https://github.com/wasi-master/wikipedia-hyperlink/issues",
     "email": "arianmollik323@gmail.com"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/wasi-master/wikipedia-hyperlinker"
+    "url": "https://github.com/wasi-master/wikipedia-hyperlink"
   },
   "engines": {
-    "vscode": "^1.63.0"
+    "vscode": "^1.31.0"
   },
   "categories": [
     "Other"
