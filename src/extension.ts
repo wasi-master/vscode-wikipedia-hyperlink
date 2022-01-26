@@ -1,8 +1,8 @@
 // The module 'vscode' contains the VS Code extensibility API
 // Import the module and reference it with the alias vscode in your code below
 import * as vscode from 'vscode';
-import axios from 'axios';
 import { escape as htmlEscape } from 'html-escaper';
+import request = require('@endom8rix/async-request');
 import markdownEscape = require("markdown-escape");
 
 // this method is called when your extension is activated
@@ -34,11 +34,12 @@ export function activate(context: vscode.ExtensionContext) {
 				progress.report({ increment: 0 });
 				// Make a request to wikipedia to get short description
 				try {
-					const response = await axios.get(`https://en.wikipedia.org/w/api.php?format=json&action=query&prop=info|extracts&exintro&explaintext&&inprop=url&redirects=1`, { 'params': { 'titles': text } });
+					const response = await request(`https://en.wikipedia.org/w/api.php?format=json&action=query&prop=info|extracts&exintro&explaintext&&inprop=url&redirects=1&titles=${encodeURIComponent(text)}`);
+					const body = JSON.parse(response.body);
 					progress.report({ increment: 100 });
 					console.log(response);
-					const summary: string = response.data['query']['pages'][Object.keys(response.data['query']['pages'])[0]]['extract'];
-					const url: string = response.data['query']['pages'][Object.keys(response.data['query']['pages'])[0]]['fullurl'];
+					const summary: string = body['query']['pages'][Object.keys(body['query']['pages'])[0]]['extract'];
+					const url: string = body['query']['pages'][Object.keys(body['query']['pages'])[0]]['fullurl'];
 					if (summary.includes("may refer to:")) {
 						vscode.window
 							.showInformationMessage(
@@ -89,14 +90,8 @@ export function activate(context: vscode.ExtensionContext) {
 						});
 					}
 				} catch (error) {
-					if (axios.isAxiosError(error) && error.response) {
-						console.error(error.response);
-						vscode.window.showErrorMessage(`Request failed with HTTP Code ${error.response.status}`);
-					} else if (axios.isAxiosError(error) && error.request) {
-						vscode.window.showErrorMessage(`Request failed`);
-					} else {
-						console.error(error);
-					}
+					vscode.window.showErrorMessage(`Request failed`);
+					console.error(error);
 				}
 
 			});
