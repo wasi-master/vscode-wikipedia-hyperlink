@@ -1,6 +1,7 @@
 {
   "name": "wikipedia-hyperlinker",
   "author": "Wasi Master <arianmollik323@gmail.com> (https://wasi-master.github.io)",
+  "publisher":"WasiMaster",
   "displayName": "Wikipedia Hyperlinker",
   "description": "Adds hyperlinks to markdown and HTML files with articles gotten from Wikipedia",
   "homepage": "https://github.com/wasi-master/wikipedia-hyperlinker#readme",
@@ -9,12 +10,34 @@
     "url": "https://github.com/wasi-master/wikipedia-hyperlinker/issues",
     "email": "arianmollik323@gmail.com"
   },
-  "repository": "https://github.com/wasi-master/wikipedia-hyperlinker",
+  "repository": {
+    "type": "git",
+    "url":"https://github.com/wasi-master/wikipedia-hyperlinker"
+  },
   "engines": {
     "vscode": "^0.10.0"
   },
   "categories": [
     "Other"
+  ],
+  "keywords": [
+    "wikipedia",
+    "hyperlink",
+    "auto",
+    "wiki",
+    "insert"
+  ],
+  "badges":[
+    {
+      "url": "https://img.shields.io/github/stars/wasi-master/vscode-wikipedia-hyperlink?style=social",
+      "href": "https://github.com/wasi-master/vscode-wikipedia-hyperlink",
+      "description": "Amount of stars gotten on GitHub"
+    },
+    {
+      "url": "https://img.shields.io/github/license/wasi-master/vscode-wikipedia-hyperlink",
+      "href": "https://github.com/wasi-master/vscode-wikipedia-hyperlink",
+      "description": "License of the source code"
+    }
   ],
   "activationEvents": [
     "onCommand:wikipedia-hyperlinker.addHyperlink"
