@@ -44,7 +44,6 @@ export function request(url: URL | string, opts: RequestOptions = {}, body: Obje
         if (!(url instanceof URL)) {
             url = new URL(url);
         }
-        const tick = new Date().getTime();
         const request = https.request(url, opts, (response: any) => {
             const chunks: any[] = [];
 

@@ -1,141 +1,14 @@
 /******/ (() => { // webpackBootstrap
-/******/ 	var __webpack_modules__ = ({
-
-/***/ 51:
-/***/ ((module) => {
-
-var replacements = [
-  [/\*/g, '\\*', 'asterisks'],
-  [/#/g, '\\#', 'number signs'],
-  [/\//g, '\\/', 'slashes'],
-  [/\(/g, '\\(', 'parentheses'],
-  [/\)/g, '\\)', 'parentheses'],
-  [/\[/g, '\\[', 'square brackets'],
-  [/\]/g, '\\]', 'square brackets'],
-  [/</g, '&lt;', 'angle brackets'],
-  [/>/g, '&gt;', 'angle brackets'],
-  [/_/g, '\\_', 'underscores']
-]
-
-module.exports = function (string, skips) {
-  skips = skips || []
-  return replacements.reduce(function (string, replacement) {
-    var name = replacement[2]
-    return name && skips.indexOf(name) !== -1
-      ? string
-      : string.replace(replacement[0], replacement[1])
-  }, string)
-}
-
-
-/***/ }),
-
-/***/ 2:
-/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
-
-"use strict";
-
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.request = void 0;
-const url_1 = __webpack_require__(28);
-const https = __webpack_require__(26);
-const qs = __webpack_require__(53);
-/**
- * Parse a request body based on known MIME types, based on the Content-Type
- * header. If unknown or undefined, will return the original request body.
- * @param {Object} opts - The request options.
- * @param {Object|string} body - The request body.
- * @returns {Object|string} A parsed request body for known MIME types, or the original request body.
- */
-function parse(opts = {}, body) {
-    if (opts.headers == null) {
-        return body;
-    }
-    switch (opts.headers['Content-Type']) {
-        case 'application/json': return JSON.stringify(body);
-        case 'application/x-www-form-urlencoded': return qs.stringify(body);
-        default: return body;
-    }
-}
-/**
- * Make an asynchronous request to an HTTP or HTTPS address. Automatically
- * derives protocol from URL input, and content length from the request body.
- * @param {URL|string} url - The request URL.
- * @param {Object} opts - The request options.
- * @param {Object|string} body - The request body.
- * @returns {Promise} A promise to return either a response object, or an error.
- */
-function request(url, opts = {}, body = '') {
-    const data = parse(opts, body);
-    if (opts.headers == null) {
-        opts.headers = {};
-    }
-    return new Promise((resolve, reject) => {
-        if (!(url instanceof url_1.URL)) {
-            url = new url_1.URL(url);
-        }
-        const tick = new Date().getTime();
-        const request = https.request(url, opts, (response) => {
-            const chunks = [];
-            response.on('data', (chunk) => {
-                chunks.push(chunk);
-            });
-            response.on('end', () => {
-                try {
-                    const { headers } = response;
-                    const body = chunks.join('');
-                    resolve({ headers, body });
-                }
-                catch (error) {
-                    reject(error);
-                }
-            });
-            response.on('error', (error) => {
-                reject(error);
-            });
-        });
-        request.write(data);
-        request.end();
-    });
-}
-exports.request = request;
-
-
-/***/ }),
-
-/***/ 1:
+/******/ 	var __webpack_modules__ = ([
+/* 0 */,
+/* 1 */
 /***/ ((module) => {
 
 "use strict";
 module.exports = require("vscode");
 
 /***/ }),
-
-/***/ 26:
-/***/ ((module) => {
-
-"use strict";
-module.exports = require("https");
-
-/***/ }),
-
-/***/ 53:
-/***/ ((module) => {
-
-"use strict";
-module.exports = require("querystring");
-
-/***/ }),
-
-/***/ 28:
-/***/ ((module) => {
-
-"use strict";
-module.exports = require("url");
-
-/***/ }),
-
-/***/ 50:
+/* 2 */
 /***/ ((__unused_webpack_module, exports) => {
 
 "use strict";
@@ -215,9 +88,128 @@ const unescape = un => replace.call(un, es, cape);
 exports.unescape = unescape;
 
 
-/***/ })
+/***/ }),
+/* 3 */
+/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
-/******/ 	});
+"use strict";
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.request = void 0;
+const url_1 = __webpack_require__(4);
+const https = __webpack_require__(5);
+const qs = __webpack_require__(6);
+/**
+ * Parse a request body based on known MIME types, based on the Content-Type
+ * header. If unknown or undefined, will return the original request body.
+ * @param {Object} opts - The request options.
+ * @param {Object|string} body - The request body.
+ * @returns {Object|string} A parsed request body for known MIME types, or the original request body.
+ */
+function parse(opts = {}, body) {
+    if (opts.headers == null) {
+        return body;
+    }
+    switch (opts.headers['Content-Type']) {
+        case 'application/json': return JSON.stringify(body);
+        case 'application/x-www-form-urlencoded': return qs.stringify(body);
+        default: return body;
+    }
+}
+/**
+ * Make an asynchronous request to an HTTP or HTTPS address. Automatically
+ * derives protocol from URL input, and content length from the request body.
+ * @param {URL|string} url - The request URL.
+ * @param {Object} opts - The request options.
+ * @param {Object|string} body - The request body.
+ * @returns {Promise} A promise to return either a response object, or an error.
+ */
+function request(url, opts = {}, body = '') {
+    const data = parse(opts, body);
+    if (opts.headers == null) {
+        opts.headers = {};
+    }
+    return new Promise((resolve, reject) => {
+        if (!(url instanceof url_1.URL)) {
+            url = new url_1.URL(url);
+        }
+        const request = https.request(url, opts, (response) => {
+            const chunks = [];
+            response.on('data', (chunk) => {
+                chunks.push(chunk);
+            });
+            response.on('end', () => {
+                try {
+                    const { headers } = response;
+                    const body = chunks.join('');
+                    resolve({ headers, body });
+                }
+                catch (error) {
+                    reject(error);
+                }
+            });
+            response.on('error', (error) => {
+                reject(error);
+            });
+        });
+        request.write(data);
+        request.end();
+    });
+}
+exports.request = request;
+
+
+/***/ }),
+/* 4 */
+/***/ ((module) => {
+
+"use strict";
+module.exports = require("url");
+
+/***/ }),
+/* 5 */
+/***/ ((module) => {
+
+"use strict";
+module.exports = require("https");
+
+/***/ }),
+/* 6 */
+/***/ ((module) => {
+
+"use strict";
+module.exports = require("querystring");
+
+/***/ }),
+/* 7 */
+/***/ ((module) => {
+
+var replacements = [
+  [/\*/g, '\\*', 'asterisks'],
+  [/#/g, '\\#', 'number signs'],
+  [/\//g, '\\/', 'slashes'],
+  [/\(/g, '\\(', 'parentheses'],
+  [/\)/g, '\\)', 'parentheses'],
+  [/\[/g, '\\[', 'square brackets'],
+  [/\]/g, '\\]', 'square brackets'],
+  [/</g, '&lt;', 'angle brackets'],
+  [/>/g, '&gt;', 'angle brackets'],
+  [/_/g, '\\_', 'underscores']
+]
+
+module.exports = function (string, skips) {
+  skips = skips || []
+  return replacements.reduce(function (string, replacement) {
+    var name = replacement[2]
+    return name && skips.indexOf(name) !== -1
+      ? string
+      : string.replace(replacement[0], replacement[1])
+  }, string)
+}
+
+
+/***/ })
+/******/ 	]);
 /************************************************************************/
 /******/ 	// The module cache
 /******/ 	var __webpack_module_cache__ = {};
@@ -255,20 +247,13 @@ exports.deactivate = exports.activate = void 0;
 // The module 'vscode' contains the VS Code extensibility API
 // Import the module and reference it with the alias vscode in your code below
 const vscode = __webpack_require__(1);
-const html_escaper_1 = __webpack_require__(50);
-const requests_1 = __webpack_require__(2);
-const markdownEscape = __webpack_require__(51);
+const html_escaper_1 = __webpack_require__(2);
+const requests_1 = __webpack_require__(3);
+const markdownEscape = __webpack_require__(7);
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
 function activate(context) {
-    // Use the console to output diagnostic information (console.log) and errors (console.error)
-    // This line of code will only be executed once when your extension is activated
-    console.log('Congratulations, your extension "wikipedia-hyperlinker" is now active!');
-    // The command has been defined in the package.json file
-    // Now provide the implementation of the command with registerCommand
-    // The commandId parameter must match the command field in package.json
     let disposable = vscode.commands.registerCommand('wikipedia-hyperlinker.addHyperlink', () => {
-        // The code you place here will be executed every time your command is executed
         var editor = vscode.window.activeTextEditor;
         if (editor !== undefined) {
             const currentSelection = editor.selection;
@@ -283,7 +268,6 @@ function activate(context) {
                 title: 'Loading article from wikipedia...'
             }, async (progress) => {
                 progress.report({ increment: 0 });
-                // Make a request to wikipedia to get short description
                 try {
                     const response = await (0, requests_1.request)(`https://en.wikipedia.org/w/api.php?format=json&action=query&prop=info|extracts&exintro&explaintext&&inprop=url&redirects=1&titles=${encodeURIComponent(text)}`);
                     const body = JSON.parse(response.body);
@@ -305,7 +289,6 @@ function activate(context) {
                         return false;
                     }
                     var currentLanguage = editor?.document.languageId;
-                    // vscode.window.showInformationMessage(`Added wikipedia article for ${text}`);
                     if (currentLanguage === "markdown") {
                         editor?.edit(editBuilder => {
                             editBuilder.replace(currentSelection, `[${markdownEscape(text)}](${url} "${markdownEscape(summary)}")`);
@@ -336,7 +319,6 @@ function activate(context) {
                     console.error(error);
                 }
             });
-            // Display a message box to the user
         }
         else {
             vscode.window.showInformationMessage('No window is active');

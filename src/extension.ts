@@ -29,7 +29,7 @@ export function activate(context: vscode.ExtensionContext) {
 				progress.report({ increment: 0 });
 
 				try {
-
+					const response = await request(`https://en.wikipedia.org/w/api.php?format=json&action=query&prop=info|extracts&exintro&explaintext&&inprop=url&redirects=1&titles=${encodeURIComponent(text)}`);
 					const body = JSON.parse(response.body);
 					progress.report({ increment: 100 });
 					console.log(response);
@@ -102,4 +102,3 @@ export function activate(context: vscode.ExtensionContext) {
 
 // this method is called when your extension is deactivated
 export function deactivate() { }
-g
