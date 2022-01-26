@@ -11,7 +11,7 @@
   },
   "repository": "https://github.com/wasi-master/wikipedia-hyperlinker",
   "engines": {
-    "vscode": "^1.63.0"
+    "vscode": "^0.10.0"
   },
   "categories": [
     "Other"
