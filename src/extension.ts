@@ -22,6 +22,10 @@ export function activate(context: vscode.ExtensionContext) {
 		if (editor !== undefined) {
 			const currentSelection = editor.selection;
 			const text = editor.document.getText(currentSelection);
+			if (text.trim() === '') {
+				vscode.window.showErrorMessage('No text is selected');
+				return false;
+			}
 			vscode.window.withProgress({
 				location: vscode.ProgressLocation.Window,
 				cancellable: false,
@@ -53,17 +57,35 @@ export function activate(context: vscode.ExtensionContext) {
 					}
 					var currentLanguage = editor?.document.languageId;
 					// vscode.window.showInformationMessage(`Added wikipedia article for ${text}`);
-					if (currentLanguage == "markdown") {
+					if (currentLanguage === "markdown") {
 						editor?.edit(editBuilder => {
 							editBuilder.replace(currentSelection,
 								`[${markdownEscape(text)}](${url} "${markdownEscape(summary)}")`
 							);
 						});
-					} else if (currentLanguage == "html") {
+					} else if (currentLanguage === "html" || currentLanguage === "jinja") {
 						editor?.edit(editBuilder => {
 							editBuilder.replace(currentSelection,
 								`<a href="${url}" title="${htmlEscape(summary)}">${htmlEscape(text)}</a>`
 							);
+						});
+					}else {
+						vscode.window.showWarningMessage(`The current language (${currentLanguage}) is not supported`,
+						...["Use HTML", "Use Markdown", "Cancel"]
+						).then((answer) => {
+							if (answer === "Use HTML") {
+								editor?.edit(editBuilder => {
+									editBuilder.replace(currentSelection,
+										`<a href="${url}" title="${htmlEscape(summary)}">${htmlEscape(text)}</a>`
+									);
+								});
+							} else if (answer === "Use Markdown"){
+								editor?.edit(editBuilder => {
+									editBuilder.replace(currentSelection,
+										`[${markdownEscape(text)}](${url} "${markdownEscape(summary)}")`
+									);
+								});
+							}
 						});
 					}
 				} catch (error) {
