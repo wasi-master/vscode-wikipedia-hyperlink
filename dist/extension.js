@@ -1,99 +1,6 @@
 /******/ (() => { // webpackBootstrap
 /******/ 	var __webpack_modules__ = ({
 
-/***/ 52:
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
-
-const http = __webpack_require__(25);
-const https = __webpack_require__(26);
-const qs = __webpack_require__(53);
-
-const colors = { 2: 32, 3: 33, 4: 31, 5: 31 }; // colours 200-299 green, 300-399 yellow, and 400-599 red
-const protocols = { http, https }; // uses HTTP or HTTPS depending on the protocols
-
-/**
- * Parse a request body based on known MIME types, based on the Content-Type
- * header. If unknown or undefined, will return the original request body.
- * @param {Object} opts - The request options.
- * @param {Object|String} body - The request body.
- * @returns {Object|String} A parsed request body for known MIME types, or the original request body.
- */
-function parse(opts = {}, body) {
-  if (opts.headers == null) {
-    return body; // terminates early if unable to retrieve MIME type
-  }
-
-  switch (opts.headers['Content-Type']) {
-    case 'application/json': return JSON.stringify(body);
-    case 'application/x-www-form-urlencoded': return qs.stringify(body);
-    default: return body;
-  }
-}
-
-/**
- * Make an asynchronous request to an HTTP or HTTPS address. Automatically
- * derives protocol from URL input, and content length from the request body.
- * @param {URL|String} url - The request URL.
- * @param {Object} opts - The request options.
- * @param {Object|String} body - The request body.
- * @returns {Promise} A promise to return either a response object, or an error.
- */
-function request(url, opts = {}, body = '') {
-  const data = parse(opts, body);
-
-  if (opts.headers == null) {
-    opts.headers = {};
-  }
-
-  if (opts.headers['Content-Length'] == null) {
-    opts.headers['Content-Length'] = Buffer.byteLength(data);
-  }
-
-  return new Promise((resolve, reject) => {
-    if (!(url instanceof URL)) {
-      url = new URL(url); // coerces input into URL if not one already
-    }
-    const protocol = protocols[url.protocol.replace(/:$/, '')]; // removes trailing colon from URL protocol value
-    const tick = new Date().getTime();
-    const request = protocol.request(url, opts, response => {
-      const chunks = []; // creates an empty array to store response body
-
-      response.on('data', chunk => {
-        chunks.push(chunk); // adds data chunk to chunks array
-      });
-
-      response.on('end', () => {
-        const tock = new Date().getTime();
-        try {
-          const { headers } = response;
-          const body = chunks.join(''); // concatenates data chunks into a single string
-          resolve({ headers, body });
-        }
-        catch (error) {
-          reject(error);
-        }
-        finally {
-          const color = `\x1b[${colors[response.statusCode.toString().charAt(0)] || 36}m`; // applies style changes, defaults to blue
-          const reset = '\x1b[0m'; // resets style changes
-          console.debug(`${color}${request.method} ${url.protocol}//${url.host}${request.path} ${response.statusCode} ${tock - tick}ms${reset}`);
-        }
-      });
-
-      response.on('error', error => {
-        reject(error);
-      });
-    });
-
-    request.write(data);
-    request.end();
-  });
-}
-
-module.exports = request;
-
-
-/***/ }),
-
 /***/ 51:
 /***/ ((module) => {
 
@@ -123,19 +30,84 @@ module.exports = function (string, skips) {
 
 /***/ }),
 
+/***/ 2:
+/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.request = void 0;
+const url_1 = __webpack_require__(28);
+const https = __webpack_require__(26);
+const qs = __webpack_require__(53);
+/**
+ * Parse a request body based on known MIME types, based on the Content-Type
+ * header. If unknown or undefined, will return the original request body.
+ * @param {Object} opts - The request options.
+ * @param {Object|string} body - The request body.
+ * @returns {Object|string} A parsed request body for known MIME types, or the original request body.
+ */
+function parse(opts = {}, body) {
+    if (opts.headers == null) {
+        return body;
+    }
+    switch (opts.headers['Content-Type']) {
+        case 'application/json': return JSON.stringify(body);
+        case 'application/x-www-form-urlencoded': return qs.stringify(body);
+        default: return body;
+    }
+}
+/**
+ * Make an asynchronous request to an HTTP or HTTPS address. Automatically
+ * derives protocol from URL input, and content length from the request body.
+ * @param {URL|string} url - The request URL.
+ * @param {Object} opts - The request options.
+ * @param {Object|string} body - The request body.
+ * @returns {Promise} A promise to return either a response object, or an error.
+ */
+function request(url, opts = {}, body = '') {
+    const data = parse(opts, body);
+    if (opts.headers == null) {
+        opts.headers = {};
+    }
+    return new Promise((resolve, reject) => {
+        if (!(url instanceof url_1.URL)) {
+            url = new url_1.URL(url);
+        }
+        const tick = new Date().getTime();
+        const request = https.request(url, opts, (response) => {
+            const chunks = [];
+            response.on('data', (chunk) => {
+                chunks.push(chunk);
+            });
+            response.on('end', () => {
+                try {
+                    const { headers } = response;
+                    const body = chunks.join('');
+                    resolve({ headers, body });
+                }
+                catch (error) {
+                    reject(error);
+                }
+            });
+            response.on('error', (error) => {
+                reject(error);
+            });
+        });
+        request.write(data);
+        request.end();
+    });
+}
+exports.request = request;
+
+
+/***/ }),
+
 /***/ 1:
 /***/ ((module) => {
 
 "use strict";
 module.exports = require("vscode");
-
-/***/ }),
-
-/***/ 25:
-/***/ ((module) => {
-
-"use strict";
-module.exports = require("http");
 
 /***/ }),
 
@@ -152,6 +124,14 @@ module.exports = require("https");
 
 "use strict";
 module.exports = require("querystring");
+
+/***/ }),
+
+/***/ 28:
+/***/ ((module) => {
+
+"use strict";
+module.exports = require("url");
 
 /***/ }),
 
@@ -276,7 +256,7 @@ exports.deactivate = exports.activate = void 0;
 // Import the module and reference it with the alias vscode in your code below
 const vscode = __webpack_require__(1);
 const html_escaper_1 = __webpack_require__(50);
-const request = __webpack_require__(52);
+const requests_1 = __webpack_require__(2);
 const markdownEscape = __webpack_require__(51);
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
@@ -305,7 +285,7 @@ function activate(context) {
                 progress.report({ increment: 0 });
                 // Make a request to wikipedia to get short description
                 try {
-                    const response = await request(`https://en.wikipedia.org/w/api.php?format=json&action=query&prop=info|extracts&exintro&explaintext&&inprop=url&redirects=1&titles=${encodeURIComponent(text)}`);
+                    const response = await (0, requests_1.request)(`https://en.wikipedia.org/w/api.php?format=json&action=query&prop=info|extracts&exintro&explaintext&&inprop=url&redirects=1&titles=${encodeURIComponent(text)}`);
                     const body = JSON.parse(response.body);
                     progress.report({ increment: 100 });
                     console.log(response);
